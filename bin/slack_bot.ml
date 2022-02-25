@@ -1,3 +1,4 @@
+open Slack_bot_lib
 open Yojson.Basic
 open Yojson.Basic.Util
 
