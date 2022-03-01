@@ -17,7 +17,7 @@ let test_case =
   { channel = test_channel; db_path = "irmin/pairing_bot_testing"; num_iter = 1000 }
 
 let real_case =
-  { channel = real_channel; db_path = "../irmin/pairing_bot"; num_iter = 100000000 }
+  { channel = real_channel; db_path = "irmin/pairing_bot"; num_iter = 100000000 }
 
 let write_matches_to_irmin_and_slack our_match case =
   let open Lwt.Syntax in
@@ -41,9 +41,9 @@ let write_opt_in_to_irmin_and_slack case =
 
 let main case =
   let open Lwt.Syntax in
-  let* () = Schedule.sleep_till `Mon (10, 0, 0) in
+  let* () = Schedule.sleep_till `Tue (11, 0, 0) in
   let* () = write_opt_in_to_irmin_and_slack case in
-  let* () = Schedule.sleep_till `Tue (10, 0, 0) in
+  let* () = Schedule.sleep_till `Wed (10, 0, 0) in
   let* most_optimum = Match.get_most_optimum case in
   write_matches_to_irmin_and_slack most_optimum case
 
