@@ -34,15 +34,13 @@ let to_string (matches_list : string list list) =
      pair-programming partner(s) by yourself:writing_hand:\n\
     \   Have some nice pair-programming sessions! \n"
 
-let get_most_optimum (case : Types.case_record) =
+let get_most_optimum (case : Types.case_record) members =
   let open Lwt.Syntax in
-  let* members = Http_requests.get_reactions case.channel case.db_path in
   match members with
-  | Error _ -> assert false
-  | Ok [] -> Lwt.return [ [] ]
-  | Ok [ only_member ] -> Lwt.return [ [ only_member ] ]
-  | Ok [ first; second ] -> Lwt.return [ [ first; second ] ]
-  | Ok members ->
+  | [] -> Lwt.return [ [] ]
+  | [ only_member ] -> Lwt.return [ [ only_member ] ]
+  | [ first; second ] -> Lwt.return [ [ first; second ] ]
+  | members ->
       let* old_matches = Irmin_io.get_old_matches case.db_path in
       let tbl = Score.construct_hashmap old_matches in
       let rec loop num_iter best_match best_score =

@@ -1,12 +1,5 @@
 (executable
  (name slack_bot)
  (public_name slack_bot)
- (libraries
-  slack_bot.lib
-  lwt
-  cohttp
-  yojson
-  irmin-unix
-  mirage-time-unix
-  ptime
-  mirage-clock-unix))
+ (libraries slack_bot.lib lwt cohttp yojson irmin-unix mirage-time-unix ptime
+   mirage-clock-unix))
