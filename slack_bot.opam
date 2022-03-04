@@ -16,6 +16,7 @@ depends: [
   "mirage-time-unix"
   "ptime"
   "mirage-clock-unix"
+  "alcotest" {with-test}
 ]
 build: [
   ["dune" "subst"] {pinned}
