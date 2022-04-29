@@ -21,4 +21,5 @@
   cohttp-lwt-unix
   mirage-time-unix
   ptime
-  mirage-clock-unix))
+  mirage-clock-unix
+  (alcotest :with-test)))
