@@ -3,6 +3,8 @@ set -euo pipefail
 
 mirage_stuff () {
     mirage config -t "$TARGET" --dhcp "$DHCP" --token "$COFFEE_TOKEN" --ssh-key "$SSH" --channel "$CHANNEL" --remote "$REMOTE" --num-iter "$NUM_ITER" --test "$IS_TEST" --curl-user-id "$CURL_USER_ID" --bot-id "$COFFEE_ID"
+    # The depext-lockfile rule do not work in some systems.
+    sed -i 's/^.*MAKE.* -s depext-lockfile.*$//g' Makefile
     make depend
     sed -i 's/main)/main) (preprocess (pps ppx_deriving_yojson))/g' dune.build # currently, the mirage config doesn't add ppxs to dune.build
     mirage build
