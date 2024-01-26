@@ -157,7 +157,7 @@ let prepare_http_1_1_headers headers host user_pass body_length =
   in
   add_authentication ~add headers user_pass
 
-let single_http_1_1_request ~sleep ?config flow user_pass host meth path headers
+let single_http_1_1_request ~sleep:_ ?config flow user_pass host meth path headers
     body =
   let body_length = Option.map String.length body in
   let headers = prepare_http_1_1_headers headers host user_pass body_length in
@@ -216,7 +216,7 @@ let single_http_1_1_request ~sleep ?config flow user_pass host meth path headers
     Httpaf.Client_connection.request ?config req ~error_handler
       ~response_handler
   in
-  Lwt.async (fun () -> Paf.run (module HTTP_1_1) ~sleep conn flow);
+  Lwt.async (fun () -> Paf.run (module HTTP_1_1) conn flow);
   Option.iter (Httpaf.Body.write_string request_body) body;
   Httpaf.Body.close_writer request_body;
   finished
@@ -231,7 +231,7 @@ let prepare_h2_headers headers host user_pass body_length =
   in
   add_authentication ~add headers user_pass
 
-let single_h2_request ~sleep ?config ~scheme flow user_pass host meth path
+let single_h2_request ~sleep:_ ?config ~scheme flow user_pass host meth path
     headers body =
   let body_length = Option.map String.length body in
   let headers = prepare_h2_headers headers host user_pass body_length in
@@ -287,12 +287,12 @@ let single_h2_request ~sleep ?config ~scheme flow user_pass host meth path
     wakeup err
   in
   let conn =
-    H2.Client_connection.create ?config ?push_handler:None ~error_handler
+    H2.Client_connection.create ?config ?push_handler:None ~error_handler ()
   in
   let request_body =
     H2.Client_connection.request conn req ~error_handler ~response_handler
   in
-  Lwt.async (fun () -> Paf.run (module H2.Client_connection) ~sleep conn flow);
+  Lwt.async (fun () -> Paf.run (module H2.Client_connection) conn flow);
   Option.iter (H2.Body.Writer.write_string request_body) body;
   H2.Body.Writer.close request_body;
   finished >|= fun v ->

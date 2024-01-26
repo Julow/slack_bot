@@ -31,6 +31,13 @@ let ssh_key =
   in
   Key.(create "ssh-key" Arg.(opt (some string) None doc))
 
+let ssh_password =
+  let doc =
+    Key.Arg.info ~doc:"SSH password"
+      [ "ssh-passwd" ]
+  in
+  Key.(create "ssh-passwd" Arg.(opt (some string) None doc))
+
 let ssh_authenticator =
   let doc =
     Key.Arg.info ~doc:"SSH host key authenticator." [ "ssh-authenticator" ]
@@ -112,22 +119,25 @@ let http_client =
   in
   let packages = [ package "httpaf"; package "h2"; package "paf" ] in
   impl ~packages ~connect "Http_mirage_client.Make"
-    (time @-> pclock @-> tcpv4v6 @-> git_client @-> http_client)
+    (time @-> pclock @-> tcpv4v6 @-> mimic @-> http_client)
 
 let stack = generic_stackv4v6 default_network
 let dns = generic_dns_client ~nameservers stack
 
 let git, http =
   let happy_eyeballs =
-    git_happy_eyeballs stack dns (generic_happy_eyeballs stack dns)
+    mimic_happy_eyeballs stack dns (generic_happy_eyeballs stack dns)
   in
   let tcp = tcpv4v6_of_stackv4v6 stack in
-  ( merge_git_clients
+  let git =
+    merge_git_clients
       (git_tcp tcp happy_eyeballs)
       (merge_git_clients
-         (git_ssh ~key:ssh_key ~authenticator:ssh_authenticator tcp
-            happy_eyeballs)
-         (git_http ~authenticator:tls_authenticator tcp happy_eyeballs)),
+         (git_ssh ~key:ssh_key ~password:ssh_password
+            ~authenticator:ssh_authenticator tcp happy_eyeballs)
+         (git_http ~authenticator:tls_authenticator tcp happy_eyeballs))
+  in
+  ( git,
     http_client $ default_time $ default_posix_clock
     $ tcpv4v6_of_stackv4v6 stack $ happy_eyeballs )
 
